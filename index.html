@@ -128,7 +128,7 @@ button{font-family:inherit;cursor:pointer}
 .opt.dim{opacity:.45}
 
 /* Klaviatur */
-.kbd{position:relative;height:150px;margin:14px auto 2px;max-width:420px;user-select:none}
+.kbd{position:relative;height:150px;margin:14px auto 2px;max-width:420px;width:100%;user-select:none}
 .wk{position:absolute;top:0;bottom:0;border:1px solid var(--staff);border-radius:0 0 6px 6px;background:#fcfaf4;
   display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px;font-size:11px;color:#9a8d78;font-weight:600}
 .bk{position:absolute;top:0;height:62%;background:#2a2521;border-radius:0 0 5px 5px;z-index:2;box-shadow:0 2px 3px rgba(0,0,0,.4)}
@@ -169,7 +169,7 @@ function staffSVG(notes,clef){
   lines.forEach(ly=>s+=`<line x1="30" y1="${ly}" x2="214" y2="${ly}" stroke="var(--staff)" stroke-width="1.4"/>`);
   s+= clef==="treble"
     ? '<text x="34" y="107" font-size="86" fill="var(--staff)" font-family="serif">𝄞</text>'
-    : '<text x="38" y="80" font-size="58" fill="var(--staff)" font-family="serif">𝄢</text>';
+    : '<text x="38" y="100" font-size="58" fill="var(--staff)" font-family="serif">𝄢</text>';
   notes.forEach((n,i)=>{
     const y=60+relY(n.l,n.o,clef), cx=xs[i];
     const rel=relY(n.l,n.o,clef);
