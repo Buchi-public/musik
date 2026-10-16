@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Notenwerkstatt">
+<meta name="theme-color" content="#efe7d7">
+<title>Notenwerkstatt</title>
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Notenwerkstatt</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap">
+<style>
+/* Layout: vertikaler Lernpfad (Stufen I–VI) auf Start; Vollbild-Lektion/Übung; Manuskript-Identität, Tinte auf Papier, ein Burgunder-Akzent, Gold für Meisterschaft. */
+:root{
+  --bg:#efe7d7; --surface:#fbf6ec; --surface2:#f3ebdc; --ink:#272019; --muted:#8a7b64;
+  --line:#dccdb0; --accent:#7c2d3a; --accent-soft:#f0dcdf; --gold:#b1842f;
+  --ok:#3f6b46; --no:#9d3b48; --staff:#3a352f;
+  --disp:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1f1b17; --surface:#2a251f; --surface2:#322c24; --ink:#efe6d6; --muted:#a9997f;
+  --line:#403930; --accent:#e0909c; --accent-soft:#3a2a2d; --gold:#d8b259;
+  --ok:#82b38d; --no:#e08391; --staff:#d8cdbb; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1f1b17; --surface:#2a251f; --surface2:#322c24; --ink:#efe6d6; --muted:#a9997f;
+  --line:#403930; --accent:#e0909c; --accent-soft:#3a2a2d; --gold:#d8b259;
+  --ok:#82b38d; --no:#e08391; --staff:#d8cdbb; color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;
+  -webkit-font-smoothing:antialiased;}
+.app{max-width:620px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:18px 40px;}
+h1,h2,h3{font-family:var(--disp);font-weight:600;text-wrap:balance;margin:0}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* Kopfzeile */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.top .brand{font-family:var(--disp);font-size:24px;font-weight:700;letter-spacing:.2px;margin-right:auto}
+.pill{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.pill .lab{color:var(--muted);font-weight:500}
+.theme-btn{background:var(--surface);border:1px solid var(--line);border-radius:999px;width:34px;height:34px;
+  font-size:15px;color:var(--ink);display:grid;place-items:center}
+
+/* Lernpfad */
+.intro{color:var(--muted);font-size:14px;margin:-6px 0 20px}
+.path{display:flex;flex-direction:column;gap:14px}
+.mod{display:flex;gap:14px;align-items:stretch;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;padding:14px 15px;text-align:left;color:inherit;width:100%;transition:transform .08s,box-shadow .15s}
+.mod:active{transform:translateY(1px)}
+.mod .num{flex:0 0 46px;display:grid;place-items:center;font-family:var(--disp);font-size:21px;font-weight:700;
+  color:var(--accent);background:var(--accent-soft);border-radius:12px}
+.mod .body{flex:1;min-width:0}
+.mod .ttl{font-family:var(--disp);font-size:17px;font-weight:600}
+.mod .sub{color:var(--muted);font-size:13px;margin-top:1px}
+.mod .meta{display:flex;align-items:center;gap:10px;margin-top:9px}
+.bar{flex:1;height:6px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);width:0}
+.stars{font-size:13px;color:var(--gold);letter-spacing:1px;white-space:nowrap}
+.locknote{font-size:11.5px;color:var(--muted)}
+
+/* Screens */
+.screen{animation:fade .2s ease}
+@keyframes fade{from{opacity:.3}to{opacity:1}}
+@keyframes pop{from{transform:scale(.97);opacity:.5}to{transform:scale(1);opacity:1}}
+.back{background:none;border:0;color:var(--accent);font-weight:600;font-size:14px;padding:4px 0;margin-bottom:10px}
+.head{margin-bottom:16px}
+.head .eyebrow{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);font-weight:700}
+.head h2{font-size:26px;margin-top:3px}
+
+/* Lektion */
+.lesson{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
+.lesson h3{font-size:19px;margin-bottom:8px}
+.lesson p{margin:0 0 11px}
+.lesson .vis{margin:14px 0}
+.lesson ul{margin:0 0 11px;padding-left:18px}
+.lesson li{margin-bottom:5px}
+.lesson b{color:var(--accent)}
+.note-box{background:var(--surface2);border-left:3px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:13.5px;color:var(--muted)}
+.dots{display:flex;gap:6px;justify-content:center;margin:16px 0}
+.dots i{width:7px;height:7px;border-radius:999px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.rowbtns{display:flex;gap:10px;margin-top:4px}
+.btn{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;
+  padding:13px;font-size:15px;font-weight:600;transition:background .12s}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn:disabled{opacity:.4}
+
+/* Übung */
+.qwrap{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 15px}
+.qprog{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.qprog .bar{height:7px}
+.qprog .cnt{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.qtext{font-family:var(--disp);font-size:19px;font-weight:600;text-align:center;margin:2px 0 4px}
+.vis{display:flex;justify-content:center}
+.card-staff{background:linear-gradient(#fffdf8,#fbf5ea);border:1px solid var(--line);border-radius:14px;
+  padding:10px;width:100%;max-width:340px;margin:12px auto}
+:root[data-theme="dark"] .card-staff,
+.card-staff{}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card-staff{background:#2f2922}}
+:root[data-theme="dark"] .card-staff{background:#2f2922}
+.card-staff svg{display:block;width:100%;height:auto;animation:pop .18s ease}
+.opts{display:grid;gap:9px;margin-top:14px}
+.opts.letters{grid-template-columns:repeat(4,1fr)}
+.opts.two{grid-template-columns:repeat(2,1fr)}
+.opt{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;
+  padding:14px 8px;font-size:16px;font-weight:600;font-family:var(--disp);transition:.1s}
+.opts.letters .opt{font-size:21px;padding:16px 0}
+.opt:active{transform:translateY(1px)}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.no{background:var(--no);color:#fff;border-color:var(--no)}
+.opt.dim{opacity:.45}
+
+/* Klaviatur */
+.kbd{position:relative;height:150px;margin:14px auto 2px;max-width:420px;user-select:none}
+.wk{position:absolute;top:0;bottom:0;border:1px solid var(--staff);border-radius:0 0 6px 6px;background:#fcfaf4;
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px;font-size:11px;color:#9a8d78;font-weight:600}
+.bk{position:absolute;top:0;height:62%;background:#2a2521;border-radius:0 0 5px 5px;z-index:2;box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.wk.hl{background:var(--accent);color:#fff}
+.bk.hl{background:var(--accent)}
+.wk.sel{background:var(--gold);color:#3a2a08}
+.bk.sel{background:var(--gold)}
+.kbd.play .wk,.kbd.play .bk{cursor:pointer}
+.hintrow{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
+
+/* Ergebnis */
+.result{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 18px}
+.result .big{font-family:var(--disp);font-size:52px;font-weight:700;color:var(--accent);line-height:1}
+.result .big .u{font-size:22px;color:var(--muted)}
+.result .lab{color:var(--muted);font-size:14px;margin-top:4px}
+.result .earned{display:inline-flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.chip{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600}
+.feedline{min-height:22px;text-align:center;font-weight:600;font-size:14px;margin-top:10px}
+.feedline.ok{color:var(--ok)}
+.feedline.no{color:var(--no)}
+</style>
+
+<div class="app" id="app"></div>
+
+<script>
+"use strict";
+/* ---------- Musik-Grundlagen (deutsch: C D E F G A H) ---------- */
+const LETTERS=["C","D","E","F","G","A","H"];
+const LI={C:0,D:1,E:2,F:3,G:4,A:5,H:6};
+const PC={C:0,D:2,E:4,F:5,G:7,A:9,H:11};
+const dia=(l,o)=>o*7+LI[l];
+const relY=(l,o,c)=>c==="treble"?(38-dia(l,o))*6:(26-dia(l,o))*6;
+
+function staffSVG(notes,clef){
+  const lines=[60,72,84,96,108];
+  const xs = notes.length===1?[132]:[108,156];
+  let s='<svg viewBox="0 0 230 170" role="img" aria-label="Notensystem">';
+  lines.forEach(ly=>s+=`<line x1="30" y1="${ly}" x2="214" y2="${ly}" stroke="var(--staff)" stroke-width="1.4"/>`);
+  s+= clef==="treble"
+    ? '<text x="34" y="107" font-size="86" fill="var(--staff)" font-family="serif">𝄞</text>'
+    : '<text x="38" y="80" font-size="58" fill="var(--staff)" font-family="serif">𝄢</text>';
+  notes.forEach((n,i)=>{
+    const y=60+relY(n.l,n.o,clef), cx=xs[i];
+    const rel=relY(n.l,n.o,clef);
+    if(rel<0){for(let L=-12;L>=rel;L-=12)s+=`<line x1="${cx-13}" y1="${60+L}" x2="${cx+13}" y2="${60+L}" stroke="var(--staff)" stroke-width="1.4"/>`;}
+    else if(rel>48){for(let L=60;L<=rel;L+=12)s+=`<line x1="${cx-13}" y1="${60+L}" x2="${cx+13}" y2="${60+L}" stroke="var(--staff)" stroke-width="1.4"/>`;}
+    const up=y>84,sx=up?cx+7.3:cx-7.3,sy2=up?y-40:y+40;
+    s+=`<line x1="${sx}" y1="${y}" x2="${sx}" y2="${sy2}" stroke="var(--staff)" stroke-width="2.1"/>`;
+    s+=`<ellipse cx="${cx}" cy="${y}" rx="8.4" ry="6.2" fill="var(--staff)" transform="rotate(-20 ${cx} ${y})"/>`;
+  });
+  return s+"</svg>";
+}
+// Notenwert-Glyph
+function valueSVG(kind){ // ganze halbe viertel achtel
+  const filled = kind==="viertel"||kind==="achtel";
+  const stem = kind!=="ganze";
+  const flag = kind==="achtel";
+  const cx=70,cy=96;
+  let s='<svg viewBox="0 0 140 150" role="img">';
+  s+=`<ellipse cx="${cx}" cy="${cy}" rx="13" ry="9.5" transform="rotate(-20 ${cx} ${cy})" fill="${filled?'var(--staff)':'none'}" stroke="var(--staff)" stroke-width="2.4"/>`;
+  if(stem)s+=`<line x1="${cx+12}" y1="${cy-3}" x2="${cx+12}" y2="${cy-58}" stroke="var(--staff)" stroke-width="2.6"/>`;
+  if(flag)s+=`<path d="M${cx+12} ${cy-58} q18 8 14 30 q6 -18 -14 -22 z" fill="var(--staff)"/>`;
+  return s+"</svg>";
+}
+
+/* ---------- Klaviatur ---------- */
+const WHITE=[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24];
+const WLAB =["C","D","E","F","G","A","H","C","D","E","F","G","A","H","C"];
+const BLACK=[1,3,6,8,10,13,15,18,20,22];
+function keyboardHTML(opts){ // {highlight:[abs], play:bool}
+  const hl=new Set(opts.highlight||[]);
+  const n=WHITE.length, w=100/n;
+  let h=`<div class="kbd ${opts.play?'play':''}" id="kbd">`;
+  WHITE.forEach((abs,i)=>{
+    const lab = opts.labels===false?"":WLAB[i];
+    h+=`<div class="wk ${hl.has(abs)?'hl':''}" data-abs="${abs}" data-pc="${abs%12}" style="left:${i*w}%;width:${w}%">${lab}</div>`;
+  });
+  BLACK.forEach(abs=>{
+    // schwarze Taste sitzt rechts der weißen mit abs-1
+    const wi=WHITE.indexOf(abs-1);
+    const center=(wi+1)*w, bw=w*0.6;
+    h+=`<div class="bk ${hl.has(abs)?'hl':''}" data-abs="${abs}" data-pc="${abs%12}" style="left:calc(${center}% - ${bw/2}%);width:${bw}%"></div>`;
+  });
+  return h+"</div>";
+}
+
+/* ---------- Tonart-Daten (Quintenzirkel) ---------- */
+const KEYS=[
+  {n:"C",acc:0,s:""},{n:"G",acc:1,s:"♯"},{n:"D",acc:2,s:"♯"},{n:"A",acc:3,s:"♯"},
+  {n:"E",acc:4,s:"♯"},{n:"H",acc:5,s:"♯"},
+  {n:"F",acc:1,s:"♭"},{n:"B",acc:2,s:"♭"},{n:"Es",acc:3,s:"♭"},{n:"As",acc:4,s:"♭"}
+];
+const accLabel=k=>k.acc===0?"keine Vorzeichen":`${k.acc} ${k.s}`;
+// I/IV/V je Dur-Tonart
+const TSD={C:["C","F","G"],G:["G","C","D"],D:["D","G","A"],A:["A","D","E"],F:["F","B","C"],B:["B","Es","F"]};
+
+/* ---------- Hilfen ---------- */
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function sampleDistinct(pool,n,notEqual){const out=[];const p=shuffle(pool);for(const x of p){if(out.length>=n)break;if(notEqual&&notEqual(x))continue;if(!out.some(y=>JSON.stringify(y)===JSON.stringify(x)))out.push(x);}return out;}
+
+/* ---------- Notenvorräte ---------- */
+const TREB=[["C",4],["D",4],["E",4],["F",4],["G",4],["A",4],["H",4],["C",5],["D",5],["E",5],["F",5],["G",5],["A",5]];
+const BASSN=[["G",2],["A",2],["H",2],["C",3],["D",3],["E",3],["F",3],["G",3],["A",3],["H",3],["C",4]];
+const TREB6=[["C",4],["D",4],["E",4],["F",4],["G",4],["A",4],["H",4],["C",5],["D",5],["E",5],["F",5],["G",5],["A",5],["H",5],["C",6]];
+
+/* ---------- Module ---------- */
+const MODULES=[
+  {id:"m1",rom:"I",ttl:"Notenlesen",sub:"Violin- & Bassschlüssel sicher lesen",
+   lessons:[
+    {h:"Das Fundament",body:`<p>Töne stehen auf fünf Linien und vier Zwischenräumen. Statt zu buchstabieren, merkst du dir <b>Ankernoten</b> und leitest die Nachbarn über den Abstand ab.</p>
+      <div class="vis card-staff">${staffSVG([{l:"G",o:4}],"treble")}</div>
+      <p>Hier das <b>G</b> – es sitzt auf der 2. Linie von unten, um die sich der Violinschlüssel dreht.</p>`},
+    {h:"Violinschlüssel",body:`<p>Linien von unten nach oben: <b>E&nbsp;G&nbsp;H&nbsp;D&nbsp;F</b>. Zwischenräume: <b>F&nbsp;A&nbsp;C&nbsp;E</b>. Das mittlere C liegt auf einer Hilfslinie <i>unter</i> dem System.</p>
+      <div class="vis card-staff">${staffSVG([{l:"C",o:4}],"treble")}</div>`},
+    {h:"Bassschlüssel",body:`<p>Für die linke Hand. Linien: <b>G&nbsp;H&nbsp;D&nbsp;F&nbsp;A</b>, Zwischenräume: <b>A&nbsp;C&nbsp;E&nbsp;G</b>. Das mittlere C liegt hier auf einer Hilfslinie <i>über</i> dem System.</p>
+      <div class="vis card-staff">${staffSVG([{l:"F",o:3}],"bass")}</div>
+      <p class="note-box">Übungsziel: unter 1,5 s pro Note. Tempo kommt durch tägliche kurze Wiederholung, nicht durch Grübeln.</p>`}
+   ], gen:"genNote"},
+
+  {id:"m2",rom:"II",ttl:"Notenwerte & Takt",sub:"Dauern und Taktarten verstehen",
+   lessons:[
+    {h:"Die Notenwerte",body:`<p>Jede Note zeigt über ihre Form, wie lange sie klingt. Im 4/4-Takt:</p>
+      <ul><li><b>Ganze</b> = 4 Zählzeiten</li><li><b>Halbe</b> = 2</li><li><b>Viertel</b> = 1</li><li><b>Achtel</b> = ½</li></ul>
+      <div class="vis card-staff" style="max-width:300px">${valueSVG("halbe")}</div>
+      <p>Offener Kopf = Halbe. Gefüllter Kopf = Viertel. Ein Fähnchen halbiert nochmals (Achtel).</p>`},
+    {h:"Taktarten",body:`<p>Die Taktangabe sagt, wie viele Schläge pro Takt und welcher Wert ein Schlag ist. <b>4/4</b>: vier Viertel. <b>3/4</b>: drei Viertel (Walzer). <b>2/4</b>: zwei Viertel.</p>
+      <p class="note-box">Punkt hinter der Note = Hälfte des Wertes dazu. Punktierte Halbe = 3 Zählzeiten.</p>`}
+   ], gen:"genValue"},
+
+  {id:"m3",rom:"III",ttl:"Intervalle",sub:"Abstände erkennen statt zählen",
+   lessons:[
+    {h:"Was ist ein Intervall?",body:`<p>Der Abstand zwischen zwei Tönen – gezählt in Tonschritten, beide Töne eingeschlossen. C→E umfasst C, D, E = <b>Terz</b>.</p>
+      <div class="vis card-staff">${staffSVG([{l:"C",o:5},{l:"E",o:5}],"treble")}</div>`},
+    {h:"Die Abstände",body:`<ul><li>2 Töne = <b>Sekunde</b></li><li>3 = <b>Terz</b></li><li>4 = <b>Quarte</b></li><li>5 = <b>Quinte</b></li><li>6 = <b>Sexte</b></li><li>7 = <b>Septime</b></li><li>8 = <b>Oktave</b></li></ul>
+      <p>Auf dem System: beide auf Linien oder beide in Zwischenräumen → ungerade Intervalle (Terz, Quinte …). Ein Wechsel Linie↔Zwischenraum → gerade (Sekunde, Quarte …).</p>
+      <p class="note-box">Intervalle als Form zu sehen ist der größte Tempo-Hebel beim Lesen – du erfasst den Sprung, nicht jede Einzelnote.</p>`}
+   ], gen:"genInterval"},
+
+  {id:"ms",rom:"IV",ttl:"Tonleitern",sub:"Dur & Moll aufbauen",
+   lessons:[
+    {h:"Die Dur-Tonleiter",body:`<p>Sieben Töne in festem Muster aus Ganz- (G) und Halbtönen (H): <b>G–G–H–G–G–G–H</b>. Die Halbtonschritte liegen zwischen Stufe <b>3–4</b> und <b>7–8</b>.</p>
+      <div class="vis">${keyboardHTML({highlight:[0,2,4,5,7,9,11,12]})}</div>
+      <p>C-Dur nutzt nur weiße Tasten – das ideale Muster zum Einprägen.</p>`},
+    {h:"Moll-Tonleitern",body:`<p>Natürliches Moll folgt dem Muster <b>G–H–G–G–H–G–G</b> – Halbtöne zwischen <b>2–3</b> und <b>5–6</b>, der Klang ist dunkler.</p>
+      <div class="vis">${keyboardHTML({highlight:[9,11,12,14,16,17,19,21]})}</div>
+      <p>Oben a-Moll, die „weiße" Moll-Tonleiter. Beim <b>harmonischen</b> Moll wird die 7. Stufe um einen Halbton erhöht, beim <b>melodischen</b> Moll aufwärts zusätzlich die 6.</p>
+      <p class="note-box">Jede Dur-Tonart hat eine Moll-Parallele mit denselben Vorzeichen – C-Dur und a-Moll teilen sich die weißen Tasten.</p>`}
+   ], gen:"genScale"},
+
+  {id:"m4",rom:"V",ttl:"Tonarten",sub:"Dur, Vorzeichen, Quintenzirkel",
+   lessons:[
+    {h:"Die Dur-Tonleiter",body:`<p>Festes Muster aus Ganz- und Halbtönen: <b>G&nbsp;G&nbsp;H&nbsp;G&nbsp;G&nbsp;G&nbsp;H</b>. C-Dur nutzt nur weiße Tasten – die Halbtöne liegen zwischen E–F und H–C.</p>
+      <div class="vis">${keyboardHTML({highlight:[0,2,4,5,7,9,11,12]})}</div>`},
+    {h:"Der Quintenzirkel",body:`<p>Jede Quinte aufwärts fügt ein <b>♯</b> hinzu: C→G→D→A→E→H. Jede Quinte abwärts ein <b>♭</b>: C→F→B→Es→As.</p>
+      <ul><li>1♯ = G-Dur, 2♯ = D-Dur, 3♯ = A-Dur …</li><li>1♭ = F-Dur, 2♭ = B-Dur, 3♭ = Es-Dur …</li></ul>
+      <p class="note-box">Deutsche Eigenheit: Das <b>H</b> heißt im Englischen „B". Die Tonart mit 2♭ heißt bei uns <b>B-Dur</b>.</p>`}
+   ], gen:"genKey"},
+
+  {id:"m5",rom:"VI",ttl:"Akkorde",sub:"Dreiklänge bauen und erkennen",
+   lessons:[
+    {h:"Der Dreiklang",body:`<p>Drei Töne im Terzabstand: Grundton, Terz, Quinte. Die Art der Terzen entscheidet den Klang.</p>
+      <ul><li><b>Dur</b>: große + kleine Terz (4+3 Halbtöne) – hell</li><li><b>Moll</b>: kleine + große Terz (3+4) – dunkel</li><li><b>vermindert</b>: 3+3 – gespannt</li><li><b>übermäßig</b>: 4+4 – schwebend</li></ul>
+      <div class="vis">${keyboardHTML({highlight:[0,4,7]})}</div>
+      <p>Oben ein <b>C-Dur</b>-Dreiklang: C–E–G.</p>`},
+    {h:"Umkehrungen & Symbole",body:`<p>Derselbe Akkord, andere Reihenfolge: E–G–C ist die 1. Umkehrung von C-Dur. Der Klang bleibt, der tiefste Ton wechselt.</p>
+      <p>Akkordsymbole: <b>C</b> = C-Dur, <b>a-Moll</b> = a&nbsp;c&nbsp;e, <b>G7</b> = Dur-Dreiklang + kleine Septime (Dominantseptakkord).</p>
+      <p class="note-box">Im Drill baust du Akkorde selbst auf der Klaviatur – genau wie am echten Klavier.</p>`}
+   ], gen:"genChord"},
+
+  {id:"m6",rom:"VII",ttl:"Harmonielehre",sub:"Stufen, Funktionen, Kadenz",
+   lessons:[
+    {h:"Die Stufen",body:`<p>Auf jedem Ton der Tonleiter steht ein Dreiklang – nummeriert mit römischen Ziffern I–VII. Drei tragen die Harmonie:</p>
+      <ul><li><b>I = Tonika</b> (Ruhe, Zuhause)</li><li><b>IV = Subdominante</b> (Aufbruch)</li><li><b>V = Dominante</b> (Spannung, will zur Tonika)</li></ul>`},
+    {h:"Die Kadenz",body:`<p>Die Grundbewegung der Harmonie: <b>I – IV – V – I</b> (T–S–D–T). In C-Dur: C – F – G – C.</p>
+      <p>Die Dominante (V) erzeugt Spannung, die sich zur Tonika (I) auflöst. Fast jedes Lied lebt von diesem Zug.</p>
+      <p class="note-box">Wer I, IV und V einer Tonart kennt, kann unzählige Stücke begleiten.</p>`}
+   ], gen:"genHarmony"}
+];
+
+/* ---------- Übungs-Generatoren ---------- */
+function genNote(){
+  const clef=Math.random()<0.5?"treble":"bass";
+  const pool=clef==="treble"?TREB:BASSN;
+  const [l,o]=rnd(pool);
+  return {type:"choice",layout:"letters",q:"Welche Note?",
+    visual:`<div class="card-staff">${staffSVG([{l,o}],clef)}</div>`,
+    options:LETTERS.map(x=>({label:x,ok:x===l}))};
+}
+function genValue(){
+  const vals=[{k:"ganze",n:"Ganze",b:4},{k:"halbe",n:"Halbe",b:2},{k:"viertel",n:"Viertel",b:1},{k:"achtel",n:"Achtel",b:"½"}];
+  if(Math.random()<0.6){
+    const v=rnd(vals);
+    return {type:"choice",layout:"two",q:"Welcher Notenwert?",
+      visual:`<div class="card-staff" style="max-width:220px">${valueSVG(v.k)}</div>`,
+      options:shuffle(vals).map(x=>({label:x.n,ok:x.n===v.n}))};
+  }else{
+    const v=rnd(vals.slice(0,3));
+    return {type:"choice",layout:"two",q:`Wie viele Zählzeiten hat eine ${v.n} im 4/4-Takt?`,
+      visual:"",options:shuffle(["4","3","2","1"]).map(x=>({label:x,ok:x===String(v.b)}))};
+  }
+}
+function genInterval(){
+  let a,b,steps;
+  do{ a=rnd(TREB6); b=rnd(TREB6); steps=Math.abs(dia(a[0],a[1])-dia(b[0],b[1])); }while(steps<1||steps>7);
+  const lo = dia(a[0],a[1])<dia(b[0],b[1])?a:b, hi = lo===a?b:a;
+  const names={1:"Sekunde",2:"Terz",3:"Quarte",4:"Quinte",5:"Sexte",6:"Septime",7:"Oktave"};
+  const correct=names[steps];
+  return {type:"choice",layout:"two",q:"Welches Intervall?",
+    visual:`<div class="card-staff">${staffSVG([{l:lo[0],o:lo[1]},{l:hi[0],o:hi[1]}],"treble")}</div>`,
+    options:Object.values(names).map(x=>({label:x,ok:x===correct}))};
+}
+function genKey(){
+  if(Math.random()<0.5){
+    const k=rnd(KEYS);
+    const others=sampleDistinct(KEYS,3,x=>x.n===k.n).map(x=>x.n);
+    return {type:"choice",layout:"letters",q:`Welche Dur-Tonart hat ${accLabel(k)}?`,
+      visual:"",options:shuffle([k.n,...others]).map(x=>({label:x+"-Dur",ok:x===k.n}))};
+  }else{
+    const k=rnd(KEYS);
+    const distract=sampleDistinct(KEYS,3,x=>accLabel(x)===accLabel(k)).map(accLabel);
+    return {type:"choice",layout:"two",q:`Wie viele Vorzeichen hat ${k.n}-Dur?`,
+      visual:"",options:shuffle([accLabel(k),...distract]).map(x=>({label:x,ok:x===accLabel(k)}))};
+  }
+}
+const QUAL={Dur:[0,4,7],Moll:[0,3,7],vermindert:[0,3,6],"übermäßig":[0,4,8]};
+function genChord(){
+  if(Math.random()<0.5){
+    const q=rnd(Object.keys(QUAL));
+    const root=Math.floor(Math.random()*8); // 0..7 damit Akkord in Klaviatur passt
+    const hl=QUAL[q].map(i=>root+i);
+    return {type:"choice",layout:"two",q:"Welcher Dreiklang?",
+      visual:`<div class="vis">${keyboardHTML({highlight:hl,labels:false})}</div>`,
+      options:shuffle(Object.keys(QUAL)).map(x=>({label:x,ok:x===q}))};
+  }else{
+    const roots=[["C",0],["D",2],["E",4],["F",5],["G",7],["A",9]];
+    const [rn,rpc]=rnd(roots);
+    const q=Math.random()<0.5?"Dur":"Moll";
+    const stack=q==="Dur"?[0,4,7]:[0,3,7];
+    const target=stack.map(i=>(rpc+i)%12);
+    return {type:"keys",q:`Baue den Akkord: ${rn}-${q}`,target,count:3,
+      hint:"Tippe die drei Töne auf der Klaviatur und prüfe."};
+  }
+}
+function genHarmony(){
+  const keys=Object.keys(TSD);
+  const k=rnd(keys);
+  const funcs=[["Tonika",0],["Subdominante",1],["Dominante",2]];
+  const [fn,idx]=rnd(funcs);
+  const correct=TSD[k][idx];
+  // Distraktoren: andere Funktionen dieser & anderer Tonarten
+  let pool=[];Object.values(TSD).forEach(a=>pool.push(...a));
+  pool=[...new Set(pool)];
+  const distract=sampleDistinct(pool.map(x=>({n:x})),3,x=>x.n===correct).map(x=>x.n);
+  return {type:"choice",layout:"two",q:`Welcher Akkord ist die ${fn} in ${k}-Dur?`,
+    visual:"",options:shuffle([correct,...distract]).map(x=>({label:x+"-Dur",ok:x===correct}))};
+}
+function genScale(){
+  const roots=[["C",0],["D",2],["E",4],["F",5],["G",7],["A",9]];
+  if(Math.random()<0.5){
+    const [rn,rpc]=rnd(roots);
+    const dur=Math.random()<0.5;
+    const steps=dur?[0,2,4,5,7,9,11]:[0,2,3,5,7,8,10];
+    const target=steps.map(i=>(rpc+i)%12);
+    return {type:"keys",q:`Baue die Tonleiter: ${rn}-${dur?"Dur":"Moll"}`,target,count:7,
+      hint:"Tippe die 7 Töne der Tonleiter und prüfe."};
+  }else{
+    const bank=[
+      {q:"Wo liegen die Halbtonschritte in Dur?",a:"zwischen 3–4 und 7–8",d:["zwischen 1–2 und 5–6","zwischen 2–3 und 6–7","überall gleich"]},
+      {q:"Wo liegen die Halbtonschritte in natürlichem Moll?",a:"zwischen 2–3 und 5–6",d:["zwischen 3–4 und 7–8","zwischen 1–2 und 4–5","keine"]},
+      {q:"Aus wie vielen Tönen besteht eine Tonleiter (ohne Oktavton)?",a:"7",d:["5","8","12"]},
+      {q:"Was wird beim harmonischen Moll verändert?",a:"7. Stufe erhöht",d:["3. Stufe erhöht","5. Stufe gesenkt","nichts"]}
+    ];
+    const it=rnd(bank);
+    return {type:"choice",layout:"two",q:it.q,visual:"",
+      options:shuffle([it.a,...it.d]).map(x=>({label:x,ok:x===it.a}))};
+  }
+}
+const GENS={genNote,genValue,genInterval,genScale,genKey,genChord,genHarmony};
+
+/* ---------- Datenschicht (zukunftssicher) ----------
+   Versioniertes, benanntes Format {schema,app,profile,data} unter trainer:<app>:<profile>.
+   Andock-Punkte für später (heute ungenutzt):
+     backend.get/set  -> Cloud-Adapter mit gleicher Signatur (Cloud-Sync)
+     PROFILE          -> Kennung fuer Mehrbenutzer-/Klassen-/Lehrer-Modus
+   Heute: rein geraetlokal, Fortschritt privat. Geraetewechsel per Sicherungscode. */
+const APP="musik", SCHEMA=1, CODE_PREFIX="MU1:";
+let PROFILE="local";
+const backend={
+  get(k){try{return localStorage.getItem(k);}catch(e){return null;}},
+  set(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
+};
+const STORE_OK=(()=>{try{localStorage.setItem("__t","1");const ok=localStorage.getItem("__t")==="1";localStorage.removeItem("__t");return ok;}catch(e){return false;}})();
+function skey(){return "trainer:"+APP+":"+PROFILE;}
+function defaults(){const d={xp:0,streak:0,lastDay:null,mods:{}};MODULES.forEach(m=>d.mods[m.id]={lesson:false,correct:0,attempts:0,best:0});return d;}
+let S=defaults();
+function applyData(o){S=defaults();if(o){S.xp=o.xp||0;S.streak=o.streak||0;S.lastDay=o.lastDay||null;if(o.mods)MODULES.forEach(m=>{if(o.mods[m.id])S.mods[m.id]=Object.assign(S.mods[m.id],o.mods[m.id]);});}}
+function load(){try{const raw=backend.get(skey());if(raw){const env=JSON.parse(raw);applyData(env&&env.data?env.data:env);}}catch(e){}}
+function save(){try{backend.set(skey(),JSON.stringify({schema:SCHEMA,app:APP,profile:PROFILE,savedAt:Date.now(),data:S}));}catch(e){}}
+function exportCode(){return CODE_PREFIX+btoa(unescape(encodeURIComponent(JSON.stringify({schema:SCHEMA,app:APP,data:S}))));}
+function importCode(str){str=(str||"").trim();if(!str.startsWith(CODE_PREFIX))throw 0;const o=JSON.parse(decodeURIComponent(escape(atob(str.slice(CODE_PREFIX.length)))));if(o.app&&o.app!==APP)throw 0;applyData(o.data||o);save();}
+function today(){return new Date().toISOString().slice(0,10);}
+function touchStreak(){
+  const t=today();
+  if(S.lastDay===t)return;
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  S.streak = S.lastDay===y ? S.streak+1 : 1;
+  S.lastDay=t; save();
+}
+function stars(m){const c=m.correct;if(c>=50&&m.best>=.9)return 3;if(c>=25&&m.best>=.75)return 2;if(c>=10)return 1;return 0;}
+function unlocked(i){return i===0 || S.mods[MODULES[i-1].id].correct>=12;}
+
+/* ---------- Routing ---------- */
+const app=document.getElementById("app");
+let view={name:"home"};
+function go(v){view=v;render();window.scrollTo(0,0);}
+
+function render(){
+  if(view.name==="home")return renderHome();
+  if(view.name==="lesson")return renderLesson();
+  if(view.name==="quiz")return renderQuiz();
+  if(view.name==="result")return renderResult();
+  if(view.name==="settings")return renderSettings();
+}
+
+function topBar(){
+  return `<div class="top">
+    <span class="brand">Notenwerkstatt</span>
+    <span class="pill"><span class="lab">XP</span>${S.xp}</span>
+    <span class="pill">🔥 ${S.streak}</span>
+    <button class="theme-btn" id="gearBtn" aria-label="Einstellungen">⚙</button>
+    <button class="theme-btn" id="themeBtn" aria-label="Theme">◐</button>
+  </div>`;
+}
+
+function renderHome(){
+  let h=topBar();
+  h+=`<p class="intro">Dein Lernpfad – Stufe für Stufe. Kurze Lektion, dann Übung. Tippe eine Stufe an.<br><span style="opacity:.8">Am Laptop: Antworten per Tasten <b>1–9</b> bzw. <b>C–H</b>, weiter mit <b>Enter</b>.</span></p><div class="path">`;
+  MODULES.forEach((m,i)=>{
+    const st=S.mods[m.id], sc=stars(m), un=unlocked(i);
+    const prog=Math.min(100,Math.round(st.correct/20*100));
+    const starStr="★".repeat(sc)+"☆".repeat(3-sc);
+    h+=`<button class="mod" data-i="${i}">
+      <span class="num">${m.rom}</span>
+      <span class="body">
+        <span class="ttl">${m.ttl}</span>
+        <span class="sub">${m.sub}</span>
+        <span class="meta">
+          <span class="bar"><i style="width:${prog}%"></i></span>
+          <span class="stars">${starStr}</span>
+        </span>
+        ${un?"":`<span class="locknote">🔒 empfohlen ab Stufe ${MODULES[i-1].rom} – antippen geht trotzdem</span>`}
+      </span>
+    </button>`;
+  });
+  h+=`</div>`;
+  app.innerHTML=h;
+  bindTheme();
+  app.querySelectorAll(".mod").forEach(b=>b.onclick=()=>openModule(+b.dataset.i));
+}
+
+function openModule(i){ go({name:"lesson",mod:i,page:0}); }
+
+function renderLesson(){
+  const m=MODULES[view.mod], L=m.lessons, p=view.page, les=L[p];
+  let h=`<button class="back" id="back">‹ Lernpfad</button>
+    <div class="head"><div class="eyebrow">Stufe ${m.rom} · ${m.ttl}</div><h2>Lektion</h2></div>
+    <div class="lesson"><h3>${les.h}</h3>${les.body}</div>
+    <div class="dots">${L.map((_,k)=>`<i class="${k===p?'on':''}"></i>`).join("")}</div>
+    <div class="rowbtns">
+      ${p>0?`<button class="btn" id="prev">Zurück</button>`:""}
+      ${p<L.length-1?`<button class="btn primary" id="next">Weiter</button>`
+        :`<button class="btn primary" id="start">Übung starten ›</button>`}
+    </div>`;
+  app.innerHTML=h;
+  app.querySelector("#back").onclick=()=>go({name:"home"});
+  const nx=app.querySelector("#next"); if(nx)nx.onclick=()=>go({name:"lesson",mod:view.mod,page:p+1});
+  const pv=app.querySelector("#prev"); if(pv)pv.onclick=()=>go({name:"lesson",mod:view.mod,page:p-1});
+  const st=app.querySelector("#start"); if(st)st.onclick=()=>{S.mods[m.id].lesson=true;save();startQuiz(view.mod);};
+}
+
+/* ---------- Quiz ---------- */
+const ROUND=8;
+let quiz=null;
+function startQuiz(modIdx){
+  const m=MODULES[modIdx];
+  const qs=[];for(let i=0;i<ROUND;i++)qs.push(GENS[m.gen]());
+  quiz={modIdx,qs,idx:0,correct:0,locked:false};
+  go({name:"quiz"});
+}
+function renderQuiz(){
+  const m=MODULES[quiz.modIdx], q=quiz.qs[quiz.idx];
+  const prog=Math.round(quiz.idx/ROUND*100);
+  let h=`<button class="back" id="back">‹ Beenden</button>
+    <div class="qprog"><span class="bar"><i style="width:${prog}%"></i></span><span class="cnt">${quiz.idx+1}/${ROUND}</span></div>
+    <div class="qwrap">
+      <div class="qtext">${q.q}</div>
+      ${q.visual||""}`;
+  if(q.type==="choice"){
+    h+=`<div class="opts ${q.layout}" id="opts">
+      ${q.options.map((o,k)=>`<button class="opt" data-k="${k}">${o.label}</button>`).join("")}
+    </div>`;
+  }else if(q.type==="keys"){
+    h+=`${keyboardHTML({play:true,labels:true})}
+      <div class="hintrow">${q.hint}</div>
+      <div class="rowbtns"><button class="btn primary" id="check">Prüfen</button></div>`;
+  }
+  h+=`<div class="feedline" id="feed"></div></div>`;
+  app.innerHTML=h;
+  app.querySelector("#back").onclick=()=>go({name:"home"});
+
+  if(q.type==="choice"){
+    app.querySelectorAll(".opt").forEach(btn=>btn.onclick=()=>answerChoice(+btn.dataset.k));
+  }else if(q.type==="keys"){
+    const kbd=app.querySelector("#kbd");
+    kbd.querySelectorAll(".wk,.bk").forEach(key=>key.onclick=()=>{ if(quiz.locked)return; key.classList.toggle("sel"); });
+    app.querySelector("#check").onclick=()=>answerKeys();
+  }
+}
+function finishQ(correct){
+  if(correct){quiz.correct++;S.xp+=10;}
+  const feed=app.querySelector("#feed");
+  feed.textContent = correct?"Richtig ✓":"Weiter geht's";
+  feed.className="feedline "+(correct?"ok":"no");
+  setTimeout(()=>{
+    quiz.idx++;
+    if(quiz.idx>=ROUND)endQuiz(); else { quiz.locked=false; renderQuiz(); }
+  }, correct?650:1250);
+  save();
+}
+function answerChoice(k){
+  if(quiz.locked)return; quiz.locked=true;
+  const q=quiz.qs[quiz.idx];
+  const btns=app.querySelectorAll(".opt");
+  const correct=q.options[k].ok;
+  btns.forEach((b,i)=>{ if(q.options[i].ok)b.classList.add("ok"); else b.classList.add("dim"); });
+  if(!correct)btns[k].classList.add("no");
+  finishQ(correct);
+}
+function answerKeys(){
+  if(quiz.locked)return;
+  const q=quiz.qs[quiz.idx];
+  const sel=[...app.querySelectorAll("#kbd .sel")].map(e=>+e.dataset.pc);
+  const got=new Set(sel), want=new Set(q.target);
+  const ok = got.size===want.size && [...want].every(x=>got.has(x));
+  quiz.locked=true;
+  // richtige Tasten markieren
+  app.querySelectorAll("#kbd .wk,#kbd .bk").forEach(e=>{
+    if(want.has(+e.dataset.pc))e.classList.add("hl");
+  });
+  finishQ(ok);
+}
+function endQuiz(){
+  const m=MODULES[quiz.modIdx], st=S.mods[m.id];
+  const acc=quiz.correct/ROUND;
+  st.correct+=quiz.correct; st.attempts+=ROUND; st.best=Math.max(st.best,acc);
+  if(acc>=0.75)S.xp+=15; // Bonus
+  touchStreak(); save();
+  go({name:"result",acc,correct:quiz.correct});
+}
+function renderResult(){
+  const m=MODULES[quiz.modIdx], st=S.mods[m.id], sc=stars(m);
+  const pct=Math.round(view.acc*100);
+  let h=topBar();
+  h+=`<div class="result screen">
+    <div class="big">${view.correct}<span class="u">/${ROUND}</span></div>
+    <div class="lab">richtig in Stufe ${m.rom} · ${m.ttl}</div>
+    <div class="earned">
+      <span class="chip">+${view.correct*10}${view.acc>=.75?" +15 Bonus":""} XP</span>
+      <span class="chip">${"★".repeat(sc)}${"☆".repeat(3-sc)}</span>
+      <span class="chip">🔥 ${S.streak} Tag${S.streak===1?"":"e"}</span>
+    </div>
+  </div>
+  <div class="rowbtns">
+    <button class="btn" id="home">Lernpfad</button>
+    <button class="btn primary" id="again">Nochmal ↺</button>
+  </div>`;
+  app.innerHTML=h;
+  bindTheme();
+  app.querySelector("#home").onclick=()=>go({name:"home"});
+  app.querySelector("#again").onclick=()=>startQuiz(quiz.modIdx);
+}
+
+/* ---------- Einstellungen / Sicherungscode ---------- */
+function renderSettings(){
+  let h=topBar();
+  h+=`<button class="back" id="back">‹ Zurück</button>
+  <div class="head"><div class="eyebrow">Einstellungen</div><h2>Fortschritt & Geräte</h2></div>
+  <div class="lesson">
+    <p>Dein Lernstand bleibt <b>privat</b> und liegt nur auf diesem Gerät.${STORE_OK?"":" <b>Achtung:</b> dieser Browser speichert nicht – bitte in Safari oder Chrome öffnen."}</p>
+    <p>Wechsel zwischen <b>iPhone und Laptop</b>: hier den Sicherungscode <b>kopieren</b> und am anderen Gerät <b>einfügen</b>.</p>
+    <div class="rowbtns"><button class="btn" id="exp">Code kopieren</button><button class="btn" id="imp">Code einfügen</button></div>
+    <textarea id="code" aria-label="Sicherungscode" placeholder="Hier erscheint bzw. hierher kommt der Code" hidden style="width:100%;min-height:72px;margin-top:10px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink);padding:9px;box-sizing:border-box"></textarea>
+    <div class="feedline" id="cmsg"></div>
+  </div>
+  <div class="rowbtns"><button class="btn" id="reset">Fortschritt zurücksetzen</button></div>`;
+  app.innerHTML=h; bindTheme();
+  app.querySelector("#back").onclick=()=>go({name:"home"});
+  const ta=app.querySelector("#code"), msg=app.querySelector("#cmsg");
+  app.querySelector("#exp").onclick=()=>{
+    const code=exportCode(); ta.hidden=false; ta.value=code;
+    const done=()=>{msg.className="feedline ok";msg.textContent="Code kopiert – z. B. in Notizen sichern oder am anderen Gerät einfügen.";};
+    try{navigator.clipboard.writeText(code).then(done,()=>{ta.select();msg.className="feedline";msg.textContent="Code markiert – bitte selbst kopieren.";});}
+    catch(e){ta.select();msg.className="feedline";msg.textContent="Code markiert – bitte selbst kopieren.";}
+  };
+  app.querySelector("#imp").onclick=()=>{
+    if(ta.hidden){ta.hidden=false;ta.value="";ta.focus();msg.className="feedline";msg.textContent="Code einfügen und nochmal auf „Code einfügen“ tippen.";return;}
+    try{importCode(ta.value);msg.className="feedline ok";msg.textContent="Lernstand übernommen.";setTimeout(()=>go({name:"home"}),700);}
+    catch(e){msg.className="feedline no";msg.textContent="Code ungültig oder unvollständig.";}
+  };
+  const rs=app.querySelector("#reset");
+  rs.onclick=()=>{ if(rs.dataset.sure){S=defaults();save();go({name:"home"});} else {rs.dataset.sure="1";rs.textContent="Wirklich zurücksetzen? Nochmal tippen";} };
+}
+
+/* ---------- Theme-Toggle ---------- */
+function currentDark(){
+  const r=document.documentElement.getAttribute("data-theme");
+  if(r)return r==="dark";
+  return matchMedia("(prefers-color-scheme:dark)").matches;
+}
+function bindTheme(){
+  const b=app.querySelector("#themeBtn"); if(b)b.onclick=()=>{ document.documentElement.setAttribute("data-theme", currentDark()?"light":"dark"); };
+  const g=app.querySelector("#gearBtn"); if(g)g.onclick=()=>go({name:"settings"});
+}
+
+/* ---------- Tastatur (Desktop/Laptop) ---------- */
+window.addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key;
+  if(view.name==="lesson"){
+    if(k==="Enter"||k==="ArrowRight"){const b=app.querySelector("#next")||app.querySelector("#start");if(b){b.click();e.preventDefault();}}
+    else if(k==="ArrowLeft"){const b=app.querySelector("#prev");if(b)b.click();}
+  }else if(view.name==="quiz"&&quiz&&!quiz.locked){
+    const q=quiz.qs[quiz.idx];
+    if(q.type==="choice"){
+      const opts=[...app.querySelectorAll(".opt")];
+      if(/^[1-9]$/.test(k)){const i=+k-1;if(opts[i]){opts[i].click();e.preventDefault();}}
+      else if(q.layout==="letters"){const up=k.toUpperCase();const i=q.options.findIndex(o=>o.label===up);if(i>=0){opts[i].click();e.preventDefault();}}
+    }else if(q.type==="keys"&&k==="Enter"){
+      const c=app.querySelector("#check");if(c){c.click();e.preventDefault();}
+    }
+  }else if(view.name==="result"&&k==="Enter"){
+    const b=app.querySelector("#again");if(b)b.click();
+  }
+});
+
+/* ---------- Start ---------- */
+load(); render();
+</script>
+
+</body>
+</html>
