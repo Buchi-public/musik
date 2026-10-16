@@ -556,7 +556,7 @@ function finishQ(correct){
   setTimeout(()=>{
     quiz.idx++;
     if(quiz.idx>=ROUND)endQuiz(); else { quiz.locked=false; renderQuiz(); }
-  }, correct?650:1250);
+  }, correct?750:1600);
   save();
 }
 function answerChoice(k){
@@ -575,11 +575,15 @@ function answerKeys(){
   const got=new Set(sel), want=new Set(q.target);
   const ok = got.size===want.size && [...want].every(x=>got.has(x));
   quiz.locked=true;
-  // richtige Tasten markieren
-  app.querySelectorAll("#kbd .wk,#kbd .bk").forEach(e=>{
-    if(want.has(+e.dataset.pc))e.classList.add("hl");
-  });
-  finishQ(ok);
+  // richtige Töne markieren (bleiben stehen, bis der Nutzer weitertippt)
+  app.querySelectorAll("#kbd .wk,#kbd .bk").forEach(e=>{ if(want.has(+e.dataset.pc))e.classList.add("hl"); });
+  if(ok){quiz.correct++;S.xp+=10;} save();
+  const feed=app.querySelector("#feed");
+  feed.textContent = ok?"Richtig ✓ – Lösung bleibt markiert":"Nicht ganz – richtige Töne sind markiert";
+  feed.className="feedline "+(ok?"ok":"no");
+  const check=app.querySelector("#check");
+  if(check){ check.textContent="Weiter ›";
+    check.onclick=()=>{ quiz.idx++; if(quiz.idx>=ROUND)endQuiz(); else { quiz.locked=false; renderQuiz(); } }; }
 }
 function endQuiz(){
   const m=MODULES[quiz.modIdx], st=S.mods[m.id];
